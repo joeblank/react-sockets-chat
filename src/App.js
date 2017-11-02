@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import './App.css';
 import socketIOClient from 'socket.io-client';
-const socket = socketIOClient('http://localhost:3001');
+import axios from 'axios';
+let socket;
+
 
 class App extends Component {
   constructor(prosp) {
     super(prosp);
     this.state = {
+      baseURL: `${process.env.REACT_APP_DM_ADD}/main-socket`,
       username: '',
       inputValue: '',
       messages: []
@@ -16,10 +19,15 @@ class App extends Component {
   }
 
   componentDidMount() {
+    socket = socketIOClient(this.state.baseURL);
     socket.on('get chat', (msg) => {
+      console.log('incoming')
       this.setState({
         messages: [...this.state.messages, msg]
       })
+    })
+    socket.on('hi', function(msg) {
+      console.log('msg', msg)
     })
   }
 
@@ -49,6 +57,7 @@ class App extends Component {
     })
     return (
       <div className="App">
+        <h1>/</h1>
         <h2>React/socket.io Chats</h2>
         <input onChange={this.username} placeholder='username' type='' className=''/>
         <form onSubmit={ this.sendMessage.bind(this) }>
@@ -60,6 +69,7 @@ class App extends Component {
             type='submit' 
             className=''>connect</button>
         </form>
+        <button onClick={()=> axios.get('/test')}>Sha-BAM</button>
        { messages }
       </div>
     );
